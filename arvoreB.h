@@ -15,10 +15,10 @@ private:
     int quant_chaves;
     TIPO *chaves;
     Nodo<TIPO> *apontadores;
+    bool eh_folha;
 public:
     Nodo(int grau_max);
     ~Nodo();
-    bool eh_folha();
 };
 
 //contrutora da classe Nodo
@@ -81,32 +81,32 @@ void arvoreB<TIPO>::Insere(Nodo<TIPO> *ap,TIPO valor) {
     if(this -> raiz == NULL) {
         novoNo -> quant_chaves = 1;
         novoNo -> chaves[0] = valor;
+        novoNo -> apontadores = NULL;
         cout<<"Inseriu o valor "<<valor<<endl;
     }else{
 
     }
 }
 
+/*
+Busca: Função para procurar em que nó está ou deve estar um determinado elemento
+Retorno: Um nó para ser feita a inserção ou que contém o número passado
+*/
 template <class TIPO>
 Nodo<TIPO>* arvoreB<TIPO>::Busca(Nodo<TIPO> *no,TIPO ch) {
-    int i;
+    int i = 0;
     if(no == NULL){
         cout << "Não tem esse registro na árvore!!!";
-        return NULL;
+        return no;
     }else{
-        for(i = 0;i < no->quant_chaves;i++){
-            if(ch < no->chaves[i]){
-                if(no->apontadores[i] != NULL)
-                    Busca(no->apontadores[i],ch);
-                else
-                    return no;
-            }else if(ch == no->chaves[i])
+        while(i < no->quant_chaves && ch > no->chaves[i])
+            i++;
+            if(ch == no->chaves[i])
                 return no;
-        }
-        if(no->apontadores[i] != NULL)
-            Busca(no->apontadores[i],ch);
-        else
-            return no;
+            if(ch < no->chaves[i])
+                Busca(no->apontadores[i-1],ch);
+            else
+                Busca(no->apontadores[i],ch);
     }
 }
 
