@@ -8,6 +8,6 @@ int main(){
     cout<<"Digite o parametro t"<<endl;
     cin>>t;
     arvoreB<int> arvore(t);
-    arvore.insere(5);
+    arvore.Insere(5);
     return 0;
 }

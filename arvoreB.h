@@ -49,9 +49,9 @@ private:
 public:
     arvoreB(int t);
     ~arvoreB();
-    bool Busca();
+    Nodo<TIPO>* Busca(Nodo<TIPO> *no,TIPO ch);
     void Insere(TIPO valor);
-    void Insere(Nodo *ap,TIPO valor)
+    void Insere(Nodo<TIPO> *ap,TIPO valor);
 };
 
 template <class TIPO>
@@ -68,12 +68,12 @@ arvoreB<TIPO>::~arvoreB() {
 
 template <class TIPO>
 void arvoreB<TIPO>::Insere(TIPO valor){
-    Busca(raiz,valor);
-    //Insere(,valor);
+    Nodo<TIPO> *no = Busca(raiz,valor);
+    Insere(no,valor);
 }
 
 template <class TIPO>
-void arvoreB<TIPO>::Insere(Nodo *ap,TIPO valor) {
+void arvoreB<TIPO>::Insere(Nodo<TIPO> *ap,TIPO valor) {
     int i;
     Nodo<TIPO>* novoNo = (Nodo<TIPO>*)malloc(sizeof(Nodo<TIPO>));
     novoNo -> chaves = (int*)malloc(sizeof(int)*4);
@@ -88,7 +88,7 @@ void arvoreB<TIPO>::Insere(Nodo *ap,TIPO valor) {
 }
 
 template <class TIPO>
-Nodo<TIPO> arvoreB<TIPO>::Busca(Nodo<TIPO> *no,TIPO ch) {
+Nodo<TIPO>* arvoreB<TIPO>::Busca(Nodo<TIPO> *no,TIPO ch) {
     int i;
     if(no == NULL){
         cout << "Não tem esse registro na árvore!!!";
