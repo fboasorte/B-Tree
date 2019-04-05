@@ -5,22 +5,23 @@
 
 using namespace std;
 
-void Leitura(arvoreB arvore){
+void Leitura(arvoreB<int> arvore){
     int valor;
     char linha[30], comando[20];
-    while(scanf("%[^\n]%s\n", linha)){
-        sscanf(linha, "%s %d", comando, valor);
+    cout<<"Digite os comandos"<<endl;
+getchar();
+    while(scanf("%[^\n]s\n", linha) == 1){
+        sscanf(linha, "%s %d", comando, &valor);
         if(strcmp(comando, "insere"))
             arvore.Insere(valor);
         else if(strcmp(comando, "busca"))
             arvore.Busca(valor);
         else if(strcmp(comando, "imprime_arvore")){
-
+	    arvore.Imprime();
         }
         else
             cout<<"Comando invalido"<<endl;
     }
-
 }
 
 int main(){
@@ -28,6 +29,6 @@ int main(){
     cout<<"Digite o parametro t"<<endl;
     cin>>t;
     arvoreB<int> arvore(t);
-    arvore.Insere(5);
+    Leitura(arvore);
     return 0;
 }
