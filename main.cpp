@@ -21,20 +21,19 @@ void Leitura(arvoreB<int> &arvore) {
         }
         else if(strcmp(comando, "busca") == 0) {
             no = arvore.Busca(valor);
-            if(no == NULL){
+            if(no == NULL) {
                 cout << "ERROR: A arvore eh NULA!!!" << endl;
             } 
-            else{
+            else {
                 int i;
-                for(i = 0; i < no -> Get_Quant_Chave(); i++) {
-                    if(no -> Get_Chave(i) == valor) {
-                        cout << "Posicao: " << i << endl;
-                        cout << "Valor: " << valor << endl;
+                for(i = 0; i < no->quant_chaves; i++) {
+                    if(no->chaves[i] == valor) {
+                        cout<<valor<<" encontrado"<<endl;
                         break;
                     }
                 }
-                if(i == no -> Get_Quant_Chave())
-                    cout << "Nao tem esse valor na arvore!!!" << endl;
+                if(i == no->quant_chaves)
+                    cout << valor <<" nao encontrado" << endl;
             }
         } 
         else if(strcmp(comando, "imprime_arvore") == 0) {
