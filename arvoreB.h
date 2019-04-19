@@ -250,17 +250,21 @@ void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
     }
 }
 
+
+template <class TIPO>
+void arvoreB<TIPO>::Puxa(Nodo<TIPO> *ap, int i){
+    int j;
+    for(j = ap -> quant_chaves - 1; i < j; i++){
+        ap -> chaves[i] = ap -> chaves[i + 1];
+    }
+    ap -> quant_chaves -= 1; 
+}
+
 template <class TIPO>
 bool arvoreB<TIPO>::Remove(TIPO valor){
     Nodo<TIPO> *no = new Nodo<TIPO>(grau_max);
     no = Busca(valor); 
     return Remove(valor, no);
-}
-
-template <class TIPO>
-void arvoreB<TIPO>::Puxa(Nodo<TIPO> *ap, int i){
-    for(int j = ap -> quant_chaves - 1; i < j; i++)
-        ap -> chaves[i] = ap -> chaves[i + 1];
 }
 
 template <class TIPO>
@@ -275,6 +279,7 @@ bool arvoreB<TIPO>::Remove(TIPO valor, Nodo<TIPO> *ap){
                 break;
             }
         }
+        Puxa(ap, posicao);
         if(ap -> eh_folha){
             if(ap -> quant_chaves > t){
                        

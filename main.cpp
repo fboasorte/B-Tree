@@ -54,6 +54,16 @@ void Leitura(arvoreB<TIPO> &arvore) {
             arvore.Imprime();
             Leitura(arvore);
         }
+        else if(strcmp(comando, "remove") == 0){
+            if(arvore.Remove(valor) == false){
+                cout<<valor<<" nao encontrado"<<endl;
+                Leitura(arvore);
+            }
+            else{
+                cout<<"foi deletado"<<endl;
+                Leitura(arvore);
+            }
+        }
         else{
             cout << "Comando invalido" << endl;
             Leitura(arvore);
