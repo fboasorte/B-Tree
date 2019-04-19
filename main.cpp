@@ -1,3 +1,13 @@
+/*
+Instituto Federal do Norte de Minas Gerais - Campus Montes Claros
+Laboratório 2   Entrega: 15/04/2019
+
+Discentes: André Vinícius Mendes Barros e Felipe Rocha Boa-Sorte
+Disciplina: Algoritmos e Estrutura de Dados III
+Docente: Alberto Miranda
+Ambiente: Ubuntu 18.04.1 LTS
+*/
+
 #include <iostream>
 #include <cstdio>
 #include <cstring>
@@ -6,53 +16,53 @@
 using namespace std;
 
 int t;
-
-void Leitura(arvoreB<int> &arvore) {
-    int valor;
-    Nodo<int> *no = new Nodo<int>(2 * t);
+/*
+Leitura: Função para ler os comandos do usuário e chamar as devidas funções 
+Retorno: sem retorno
+*/
+template <class TIPO>
+void Leitura(arvoreB<TIPO> &arvore) {
+    TIPO valor;
     char linha[30], comando[20];
-    cout << "---------------Digite os comandos---------------" << endl;
-    cout << "Comando: ";
     getchar();
     while(scanf("%[^\n]s\n", linha) == 1) {
+        Nodo<TIPO> *no = new Nodo<TIPO>(2 * t);
         sscanf(linha, "%s %d", comando, &valor);
         if(strcmp(comando, "insere") == 0){
             arvore.Insere(valor);
+            Leitura(arvore);
         }
         else if(strcmp(comando, "busca") == 0) {
             no = arvore.Busca(valor);
             if(no == NULL) {
                 cout << "ERROR: A arvore eh NULA!!!" << endl;
-            } 
+            }
             else {
                 int i;
                 for(i = 0; i < no->quant_chaves; i++) {
                     if(no->chaves[i] == valor) {
-                        cout<<valor<<" encontrado"<<endl;
+                        cout << valor << " encontrado" << endl;
                         break;
                     }
                 }
                 if(i == no->quant_chaves)
                     cout << valor <<" nao encontrado" << endl;
             }
-        } 
+            Leitura(arvore);
+        }
         else if(strcmp(comando, "imprime_arvore") == 0) {
             arvore.Imprime();
-        } 
-        else
+            Leitura(arvore);
+        }
+        else{
             cout << "Comando invalido" << endl;
-        Leitura(arvore);
+            Leitura(arvore);
+        }
     }
 }
 
 int main() {
-    cout<<"Digite o parametro t"<<endl;
     cin>>t;
-    cout << "------------------Documentacao------------------" << endl;
-    cout << "Para inserir digite - 'insere' e o valor " << endl;
-    cout << "Para buscar digite - 'busca' e o valor " << endl;
-    cout << "Para imprimir a arvore digite - 'imprime_arvore'" << endl;
-    cout << "------------------------------------------------" << endl << endl;
     arvoreB<int> arvore(t);
     Leitura(arvore);
     return 0;
