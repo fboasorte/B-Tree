@@ -34,20 +34,10 @@ void Leitura(arvoreB<TIPO> &arvore) {
         }
         else if(strcmp(comando, "busca") == 0) {
             no = arvore.Busca(valor);
-            if(no == NULL) {
-                cout << "ERROR: A arvore eh NULA!!!" << endl;
-            }
-            else {
-                int i;
-                for(i = 0; i < no->quant_chaves; i++) {
-                    if(no->chaves[i] == valor) {
-                        cout << valor << " encontrado" << endl;
-                        break;
-                    }
-                }
-                if(i == no->quant_chaves)
-                    cout << valor <<" nao encontrado" << endl;
-            }
+            if(no == NULL)
+                cout<<valor<<" nao encontrado"<<endl;
+            else
+                cout<<valor<<" encontrado"<<endl;
             Leitura(arvore);
         }
         else if(strcmp(comando, "imprime_arvore") == 0) {
@@ -60,7 +50,7 @@ void Leitura(arvoreB<TIPO> &arvore) {
                 Leitura(arvore);
             }
             else{
-                cout<<"foi deletado"<<endl;
+                cout<<valor<<" encontrado"<<endl;
                 Leitura(arvore);
             }
         }
