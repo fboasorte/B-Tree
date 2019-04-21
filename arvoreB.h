@@ -10,12 +10,13 @@ class arvoreB;
 template <class TIPO>
 class Nodo {
     friend class arvoreB<TIPO>;
-public:
+private:
     int quant_chaves;
     TIPO *chaves;
     Nodo<TIPO> **pai;
     Nodo<TIPO> **filhos;
     bool eh_folha;
+public:
     Nodo(int grau_max);
     ~Nodo();
 };
@@ -39,14 +40,13 @@ Nodo<TIPO>::~Nodo() {
 
 template <class TIPO>
 class arvoreB {
-public:
+private:    
     int t, grau_max;
     Nodo<TIPO> *raiz;
+public:
     arvoreB(int t);
-    ~arvoreB();
     Nodo<TIPO>* Busca(Nodo<TIPO> *no,TIPO valor);
     Nodo<TIPO>* Busca(TIPO valor);
-    void Empurra(Nodo<TIPO> *ap,int i);
     void Insere(TIPO valor);
     void Insere_No_Sublotado(Nodo<TIPO> *ap, TIPO valor);
     void Insere_Raiz_Nula(TIPO valor);
@@ -54,10 +54,17 @@ public:
     void Imprime();
     void Imprime(Nodo<TIPO> *ap);
     bool Remove(TIPO valor);
-    bool Remove(TIPO valor, Nodo<TIPO> *ap);
-    void Puxa(Nodo<TIPO> *ap, int i);
+    bool Remove(Nodo<TIPO> *ap, TIPO valor);
+    void Remove_De_Folha(Nodo<TIPO> *ap, int posicao);
+    void Remove_De_Nao_Folha(Nodo<TIPO> *ap, int posicao);
+    int Get_Posicao(Nodo<TIPO> *ap, TIPO valor);
+    void Empresta_Do_Anterior(Nodo<TIPO> *ap, int posicao);
+    void Empresta_Do_Sucessor(Nodo<TIPO> *ap, int posicao);
+    int Get_Antecessor(Nodo<TIPO> *ap, int posicao);
+    int Get_Sucessor(Nodo<TIPO> *ap, int posicao);
+    void Preenche(Nodo<TIPO> *ap, int posicao);
+    void Junta(Nodo<TIPO> *ap, int posicao);
 };
-
 template <class TIPO>
 arvoreB<TIPO>::arvoreB(int t) {
     this -> t = t;
@@ -65,28 +72,6 @@ arvoreB<TIPO>::arvoreB(int t) {
     this -> raiz = NULL;
 }
 
-template <class TIPO>
-arvoreB<TIPO>::~arvoreB() {
-
-}
-
-
-/*
-Empurra: Função para empurrar as chaves do nó, abrindo espaço para a chave que será inserida
-Retorno: sem retorno
-*/
-template <class TIPO>
-void arvoreB<TIPO>::Empurra(Nodo<TIPO> *ap,int i) {
-    for(int j = ap->quant_chaves; j > i; j--) {
-        ap->chaves[j] = ap->chaves[j-1];
-    }
-}
-
-/*
-Insere:  Verifca as condições do nó em que chave será inserida, chama as funções Empurra e Insere_No_Sublotado
-caso o nó fique superlotado é chamada a função Split
-Retorno: sem retorno
-*/
 template <class TIPO>
 void arvoreB<TIPO>::Insere(TIPO valor) {
     if(raiz == NULL) {
@@ -160,11 +145,9 @@ void arvoreB<TIPO>::Split(int i, Nodo<TIPO> *y, Nodo<TIPO> *x){
     y -> quant_chaves = t - 1;
     for(int j = x -> quant_chaves; j >= i + 1; j--)
         x -> filhos[j + 1] = x -> filhos[j];
-
     x -> filhos[i + 1] = z;
     for(int j = x -> quant_chaves - 1; j >= i; j--)
         x -> chaves[j + 1] = x -> chaves[j];
-
     x -> chaves[i] = y -> chaves[t - 1];
     x -> quant_chaves += 1;
 }
@@ -206,8 +189,12 @@ void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
     for(i = 0; i < ap -> quant_chaves; i++){
         if(!ap -> eh_folha)
             Imprime(ap -> filhos[i]);
-        if(i != ap -> quant_chaves)
-            cout<<" "<< ap -> chaves[i]<<" ";
+        if(i != ap -> quant_chaves){
+            if(i == 0)
+                cout<<ap -> chaves[i];
+            else
+                cout<<" "<< ap -> chaves[i];
+        }
     }
     if(!ap -> eh_folha)
         Imprime(ap -> filhos[i]);
@@ -215,44 +202,162 @@ void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
 }
 
 template <class TIPO>
-void arvoreB<TIPO>::Puxa(Nodo<TIPO> *ap, int i){
-    int j;
-    for(j = ap -> quant_chaves - 1; i < j; i++){
+bool arvoreB<TIPO>::Remove(TIPO valor){
+    if(raiz == NULL)
+        return false;
+    Remove(raiz, valor);
+    if(raiz -> quant_chaves == 0){
+        Nodo<TIPO> *temporario = raiz;
+        if(raiz -> eh_folha)
+            raiz = NULL;
+        else
+            raiz = raiz -> filhos[0];
+        delete temporario;
+    }
+    return true;
+}
+
+template <class TIPO>
+bool arvoreB<TIPO>::Remove(Nodo<TIPO> *ap, TIPO valor){
+    int posicao = Get_Posicao(ap, valor);
+    if(posicao < ap -> quant_chaves && ap -> chaves[posicao] == valor){
+        if(ap -> eh_folha)
+            Remove_De_Folha(ap, posicao);
+        else
+            Remove_De_Nao_Folha(ap, posicao);
+    }
+    else{
+            if(ap -> eh_folha)
+                return false;
+            bool flag = ((posicao == ap -> quant_chaves)?true:false);
+            if(ap -> filhos[posicao]-> quant_chaves < t)
+                Preenche(ap, posicao);
+            if(flag && posicao > ap -> quant_chaves)
+                Remove(ap -> filhos[posicao - 1], valor);
+            else
+                Remove(ap -> filhos[posicao], valor);
+    }
+}
+
+template <class TIPO>
+void arvoreB<TIPO>::Remove_De_Folha(Nodo<TIPO> *ap, int posicao){
+    for(int i = posicao; i < ap -> quant_chaves - 1; i++){
         ap -> chaves[i] = ap -> chaves[i + 1];
     }
-    ap -> quant_chaves -= 1; 
+    ap -> quant_chaves -= 1;
 }
 
 template <class TIPO>
-bool arvoreB<TIPO>::Remove(TIPO valor){
-    Nodo<TIPO> *no = new Nodo<TIPO>(grau_max);
-    no = Busca(valor); 
-    return Remove(valor, no);
-}
-
-template <class TIPO>
-bool arvoreB<TIPO>::Remove(TIPO valor, Nodo<TIPO> *ap){
-    if(ap == NULL)    
-        return false;
+void arvoreB<TIPO>::Remove_De_Nao_Folha(Nodo<TIPO> *ap, int posicao){
+    TIPO k = ap -> chaves[posicao];
+    if(ap -> filhos[posicao] -> quant_chaves >= t){
+        int antecessor = Get_Antecessor(ap, posicao);
+        ap -> chaves[posicao] = antecessor;
+        Remove(ap -> filhos[posicao], antecessor);
+    }
+    else if(ap -> filhos[posicao + 1] -> quant_chaves >= t){
+        int sucessor = Get_Sucessor(ap, posicao);
+        ap -> chaves[posicao] = sucessor;
+        Remove(ap -> filhos[posicao], sucessor);
+    }
     else{
-        int i, posicao;
-        for(i = 0; i < ap -> quant_chaves; i++){
-            if(ap -> chaves[i] == valor){
-                posicao = i;
-                break;
-            }
-        }
-        Puxa(ap, posicao);
-        if(ap -> eh_folha){
-            if(ap -> quant_chaves > t){
-                       
-            }
-            else{
-
-            }            
-        }
+        Junta(ap, posicao);
+        Remove(ap -> filhos[posicao], k);
     }
 }
 
+template <class TIPO>
+int arvoreB<TIPO>::Get_Posicao(Nodo<TIPO> *ap, TIPO valor){
+    int i = 0;
+    while(i < ap -> quant_chaves && valor > ap -> chaves[i])
+        i++;
+    return i;
+}
+
+template <class TIPO>
+int arvoreB<TIPO>::Get_Antecessor(Nodo<TIPO> *ap, int posicao){
+    Nodo<TIPO> *cur = ap -> filhos[posicao];
+    while(!cur -> eh_folha)
+        cur = cur -> filhos[cur -> quant_chaves];
+    return cur -> chaves[cur -> quant_chaves - 1];
+}
+
+template <class TIPO>
+int arvoreB<TIPO>::Get_Sucessor(Nodo<TIPO> *ap, int posicao){
+    Nodo<TIPO> *cur = ap -> filhos[posicao + 1];
+    while(!cur -> eh_folha)
+        cur = cur -> filhos[0];
+    return cur -> chaves[0];
+}
+
+template <class TIPO>
+void arvoreB<TIPO>::Empresta_Do_Anterior(Nodo<TIPO> *ap, int posicao){
+    Nodo<TIPO> *filho = ap -> filhos[posicao];
+    Nodo<TIPO> *irmao = ap -> filhos[posicao - 1];
+    for(int i = filho -> quant_chaves - 1; i >= 0; i--)
+        filho -> chaves[i + 1] = filho -> chaves[i];
+    if(!filho -> eh_folha){
+        for(int i = filho -> quant_chaves; i >= 0; i--)
+            filho -> filhos[i + 1] = filho -> filhos[i];
+    }
+    filho -> chaves[0] = ap -> chaves[posicao - 1];
+    if(!filho -> eh_folha)
+        filho -> filhos[0] = irmao -> filhos[irmao -> quant_chaves];
+    ap -> chaves[posicao - 1] = irmao -> chaves[irmao -> quant_chaves - 1];
+    filho -> quant_chaves += 1;
+    irmao -> quant_chaves -= 1;
+}
+
+template <class TIPO>
+void arvoreB<TIPO>::Empresta_Do_Sucessor(Nodo<TIPO> *ap, int posicao){
+    Nodo<TIPO> *filho = ap -> filhos[posicao];
+    Nodo<TIPO> *irmao = ap -> filhos[posicao + 1];
+    filho -> chaves[filho -> quant_chaves] = ap -> chaves[posicao];
+    if(!filho -> eh_folha)
+        filho -> filhos[filho -> quant_chaves + 1] = irmao -> filhos[0];
+    ap -> chaves[posicao] = irmao -> chaves[0];
+    for(int i = 1; i < irmao -> quant_chaves; i++)
+        irmao -> chaves[i - 1] = irmao -> chaves[i];
+    if(!irmao -> eh_folha){
+        for(int i = 1; i <= irmao -> quant_chaves; i++)
+            irmao -> chaves[i - 1] = irmao -> chaves[i];
+    }
+    filho -> quant_chaves += 1;
+    irmao -> quant_chaves -= 1;
+}
+
+template <class TIPO>
+void arvoreB<TIPO>::Preenche(Nodo<TIPO> *ap, int posicao){
+    if(posicao != 0 && ap -> filhos[posicao - 1] -> quant_chaves >= t)
+        Empresta_Do_Anterior(ap, posicao);
+    else if(posicao != ap ->quant_chaves && ap -> filhos[posicao + 1] -> quant_chaves >= t)
+        Empresta_Do_Sucessor(ap, posicao);
+    else{
+        if(posicao != 0)
+            Junta(ap, posicao - 1);
+        else
+            Junta(ap, posicao);
+    }
+}
+
+template <class TIPO>
+void arvoreB<TIPO>::Junta(Nodo<TIPO> *ap, int posicao){
+    Nodo<TIPO> *filho = ap -> filhos[posicao];
+    Nodo<TIPO> *irmao = ap -> filhos[posicao + 1];
+    filho -> chaves[t - 1] = ap -> chaves[posicao];
+    for(int i = 0; i < irmao -> quant_chaves; i++)
+        filho -> chaves[i + t] = irmao -> chaves[i];
+    if(!filho -> eh_folha){
+        for(int i = 0; i <= irmao -> quant_chaves; i++)
+            filho -> filhos[i + t] = irmao -> filhos[i];
+    }
+    for(int i = posicao + 1; i < ap ->quant_chaves; i++)
+        ap -> chaves[i - 1] = ap -> chaves[i];
+    for(int i = posicao + 2; i <= ap -> quant_chaves; i++)
+        ap -> filhos[i - 1] = ap -> filhos[i];
+    filho -> quant_chaves += irmao -> quant_chaves + 1;
+    ap -> quant_chaves -= 1;
+    delete(irmao);
+}
 
 #endif //ARVOREB_H
