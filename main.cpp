@@ -26,15 +26,13 @@ void Leitura(arvoreB<TIPO> &arvore) {
     char linha[30], comando[20];
     getchar();
     while(scanf("%[^\n]s\n", linha) == 1) {
-        Nodo<TIPO> *no = new Nodo<TIPO>(2 * t);
         sscanf(linha, "%s %d", comando, &valor);
         if(strcmp(comando, "insere") == 0){
             arvore.Insere(valor);
             Leitura(arvore);
         }
         else if(strcmp(comando, "busca") == 0) {
-            no = arvore.Busca(valor);
-            if(no == NULL)
+            if(arvore.Busca(valor) == NULL)
                 cout<<valor<<" nao encontrado"<<endl;
             else
                 cout<<valor<<" encontrado"<<endl;
@@ -45,10 +43,8 @@ void Leitura(arvoreB<TIPO> &arvore) {
             Leitura(arvore);
         }
         else if(strcmp(comando, "remove") == 0){
-            if(arvore.Busca(valor) == NULL){
-                cout<<valor<<" nao encontrado"<<endl;
+            if(arvore.Busca(valor) == NULL)
                 Leitura(arvore);
-            }
             else{
                 arvore.Remove(valor);
                 Leitura(arvore);
