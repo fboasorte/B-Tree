@@ -45,12 +45,12 @@ void Leitura(arvoreB<TIPO> &arvore) {
             Leitura(arvore);
         }
         else if(strcmp(comando, "remove") == 0){
-            if(arvore.Remove(valor) == false){
+            if(arvore.Busca(valor) == NULL){
                 cout<<valor<<" nao encontrado"<<endl;
                 Leitura(arvore);
             }
             else{
-                cout<<valor<<" encontrado"<<endl;
+                arvore.Remove(valor);
                 Leitura(arvore);
             }
         }

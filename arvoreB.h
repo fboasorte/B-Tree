@@ -13,7 +13,6 @@ class Nodo {
 private:
     int quant_chaves;
     TIPO *chaves;
-    Nodo<TIPO> **pai;
     Nodo<TIPO> **filhos;
     bool eh_folha;
 public:
@@ -25,7 +24,6 @@ public:
 template <class TIPO>
 Nodo<TIPO>::Nodo(int grau_max) {
     this -> quant_chaves = 0;
-    this -> pai = new Nodo*[1];
     this -> filhos = new Nodo*[grau_max];
     this -> chaves = new TIPO[grau_max - 1];
 }
@@ -34,7 +32,6 @@ Nodo<TIPO>::Nodo(int grau_max) {
 template <class TIPO>
 Nodo<TIPO>::~Nodo() {
     delete [] this -> chaves;
-    delete [] this -> pai;
     delete [] this -> filhos;
 }
 
@@ -65,6 +62,7 @@ public:
     void Preenche(Nodo<TIPO> *ap, int posicao);
     void Junta(Nodo<TIPO> *ap, int posicao);
 };
+
 template <class TIPO>
 arvoreB<TIPO>::arvoreB(int t) {
     this -> t = t;
@@ -72,6 +70,10 @@ arvoreB<TIPO>::arvoreB(int t) {
     this -> raiz = NULL;
 }
 
+/*
+Insere: Funcao principal de insercao
+Retorno: Sem retorno
+  */
 template <class TIPO>
 void arvoreB<TIPO>::Insere(TIPO valor) {
     if(raiz == NULL) {
@@ -95,6 +97,9 @@ void arvoreB<TIPO>::Insere(TIPO valor) {
     }
 }
 
+/*Insere_no_sublotado:insere quando a arvore nao esta nao esta lotada
+retorno: sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Insere_No_Sublotado(Nodo<TIPO> *ap, TIPO valor){
     int i = ap -> quant_chaves - 1;
@@ -118,6 +123,9 @@ void arvoreB<TIPO>::Insere_No_Sublotado(Nodo<TIPO> *ap, TIPO valor){
     }
 }
 
+/*Insere_Raiz_Nula: Realiza a primeira insercao nao arvore
+retorno: sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Insere_Raiz_Nula(TIPO valor) {
     Nodo<TIPO>* novoNo = new Nodo<TIPO>(grau_max);
@@ -126,16 +134,17 @@ void arvoreB<TIPO>::Insere_Raiz_Nula(TIPO valor) {
     novoNo ->eh_folha = true;
     for(int i = 0; i < grau_max; i++)
         novoNo -> filhos[i] = NULL;
-    novoNo -> pai = NULL;
     this->raiz = novoNo;
 }
 
+/*Split: Divide um No quando ele superlota
+retorno: sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Split(int i, Nodo<TIPO> *y, Nodo<TIPO> *x){
     Nodo<TIPO> *z = new Nodo<TIPO>(grau_max);
     z -> eh_folha = y -> eh_folha;
     z -> quant_chaves = t - 1;
-
     for(int j = 0; j < t - 1; j++)
         z -> chaves[j] = y -> chaves[j + t];
     if(!y -> eh_folha){
@@ -151,16 +160,21 @@ void arvoreB<TIPO>::Split(int i, Nodo<TIPO> *y, Nodo<TIPO> *x){
     x -> chaves[i] = y -> chaves[t - 1];
     x -> quant_chaves += 1;
 }
-
+/*Busca: Eh funcao que chama a funcao recursiva de busca
+Retorno: Retorna a funcao busca 
+ */
 template <class TIPO>
 Nodo<TIPO>* arvoreB<TIPO>::Busca(TIPO valor) {
     return Busca(this -> raiz, valor);
 }
 
+/*Busca: Funcao recursiva de busca do valor
+Retorno: Retorna o no onde o valor esta ou NULL se o valor nao estiver na arvore
+ */
 template <class TIPO>
 Nodo<TIPO>* arvoreB<TIPO>::Busca(Nodo<TIPO> *no,TIPO valor) {
     if(no == NULL) {
-        return no;
+        return NULL;
     }
     else {
         int i = 0;
@@ -174,6 +188,9 @@ Nodo<TIPO>* arvoreB<TIPO>::Busca(Nodo<TIPO> *no,TIPO valor) {
     }
 }
 
+/*Imprime: Chama a funcao recursiva de impressao
+Retorno: sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Imprime() {
     if(raiz != NULL){
@@ -181,7 +198,9 @@ void arvoreB<TIPO>::Imprime() {
     }
     cout<<endl;
 }
-
+/*Imprime: Funcao recursiva de impressao
+Retorno: sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
     int i;
@@ -201,6 +220,9 @@ void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
     cout<<")";
 }
 
+/*Remove: Funcao que chama a funcao de remocao
+Retorno: Retorna falso se o valor nao existe na arvore e verdadeior se existe
+ */
 template <class TIPO>
 bool arvoreB<TIPO>::Remove(TIPO valor){
     if(raiz == NULL)
@@ -217,6 +239,9 @@ bool arvoreB<TIPO>::Remove(TIPO valor){
     return true;
 }
 
+/*Remove: Funcao recursiva de remocao 
+Retorno: Retorna falso se o valor nao existe na arvore e verdadeior se existe
+ */
 template <class TIPO>
 bool arvoreB<TIPO>::Remove(Nodo<TIPO> *ap, TIPO valor){
     int posicao = Get_Posicao(ap, valor);
@@ -239,6 +264,9 @@ bool arvoreB<TIPO>::Remove(Nodo<TIPO> *ap, TIPO valor){
     }
 }
 
+/*Remove_De_Folha: Funcao de remover um valor do no folha
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Remove_De_Folha(Nodo<TIPO> *ap, int posicao){
     for(int i = posicao; i < ap -> quant_chaves - 1; i++){
@@ -247,6 +275,9 @@ void arvoreB<TIPO>::Remove_De_Folha(Nodo<TIPO> *ap, int posicao){
     ap -> quant_chaves -= 1;
 }
 
+/*Remove_De_Nao_Folha: Funcao de remover um valor do no que nao eh folha
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Remove_De_Nao_Folha(Nodo<TIPO> *ap, int posicao){
     TIPO k = ap -> chaves[posicao];
@@ -266,6 +297,9 @@ void arvoreB<TIPO>::Remove_De_Nao_Folha(Nodo<TIPO> *ap, int posicao){
     }
 }
 
+/*Get_Posicao: Funcao para conseguir a posicao do valor no nodo
+Retorno: Retorna o indice da posicao do valor no nodo
+ */
 template <class TIPO>
 int arvoreB<TIPO>::Get_Posicao(Nodo<TIPO> *ap, TIPO valor){
     int i = 0;
@@ -274,6 +308,9 @@ int arvoreB<TIPO>::Get_Posicao(Nodo<TIPO> *ap, TIPO valor){
     return i;
 }
 
+/*Get_Antecessor: Funcao para conseguir o antecessor do no
+Retorno: Retorna o valor na chave do antecessor
+ */
 template <class TIPO>
 int arvoreB<TIPO>::Get_Antecessor(Nodo<TIPO> *ap, int posicao){
     Nodo<TIPO> *cur = ap -> filhos[posicao];
@@ -282,6 +319,9 @@ int arvoreB<TIPO>::Get_Antecessor(Nodo<TIPO> *ap, int posicao){
     return cur -> chaves[cur -> quant_chaves - 1];
 }
 
+/*Get_Sucessor: Funcao para conseguir o sucessor do no
+Retorno: Retorna o valor na chave do sucessor
+ */
 template <class TIPO>
 int arvoreB<TIPO>::Get_Sucessor(Nodo<TIPO> *ap, int posicao){
     Nodo<TIPO> *cur = ap -> filhos[posicao + 1];
@@ -290,6 +330,9 @@ int arvoreB<TIPO>::Get_Sucessor(Nodo<TIPO> *ap, int posicao){
     return cur -> chaves[0];
 }
 
+/*Empresta_Do_Anterior: Funcao para pegar valores emprestados do antecessor quando o nodo esta abaixo do limite
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Empresta_Do_Anterior(Nodo<TIPO> *ap, int posicao){
     Nodo<TIPO> *filho = ap -> filhos[posicao];
@@ -308,6 +351,9 @@ void arvoreB<TIPO>::Empresta_Do_Anterior(Nodo<TIPO> *ap, int posicao){
     irmao -> quant_chaves -= 1;
 }
 
+/*Empresta_Do_Anterior: Funcao para pegar valores emprestados do sucessor quando o nodo esta abaixo do limite
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Empresta_Do_Sucessor(Nodo<TIPO> *ap, int posicao){
     Nodo<TIPO> *filho = ap -> filhos[posicao];
@@ -326,6 +372,9 @@ void arvoreB<TIPO>::Empresta_Do_Sucessor(Nodo<TIPO> *ap, int posicao){
     irmao -> quant_chaves -= 1;
 }
 
+/*Preenche: Funcao para deixar o nodo dentro do limite apos um valor ter sido removido
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Preenche(Nodo<TIPO> *ap, int posicao){
     if(posicao != 0 && ap -> filhos[posicao - 1] -> quant_chaves >= t)
@@ -340,6 +389,9 @@ void arvoreB<TIPO>::Preenche(Nodo<TIPO> *ap, int posicao){
     }
 }
 
+/*Junta: Junta um nodo com o seu sucessor
+Retorno: Sem retorno
+ */
 template <class TIPO>
 void arvoreB<TIPO>::Junta(Nodo<TIPO> *ap, int posicao){
     Nodo<TIPO> *filho = ap -> filhos[posicao];
