@@ -206,17 +206,24 @@ void arvoreB<TIPO>::Imprime(Nodo<TIPO> *ap) {
     int i;
     cout<<"(";
     for(i = 0; i < ap -> quant_chaves; i++){
-        if(!ap -> eh_folha)
+        if(!ap -> eh_folha){
             Imprime(ap -> filhos[i]);
+            if(i == 0)
+                cout<<" ";
+        }
         if(i != ap -> quant_chaves){
             if(i == 0)
                 cout<<ap -> chaves[i];
             else
                 cout<<" "<< ap -> chaves[i];
+            if(!ap -> eh_folha)
+                cout<<" ";
         }
     }
-    if(!ap -> eh_folha)
+    if(!ap -> eh_folha){ 
         Imprime(ap -> filhos[i]);
+    }
+
     cout<<")";
 }
 
